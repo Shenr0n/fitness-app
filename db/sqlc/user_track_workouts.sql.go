@@ -19,6 +19,49 @@ func (q *Queries) DeleteUserTrackWorkouts(ctx context.Context, username string) 
 	return err
 }
 
+const getRecords = `-- name: GetRecords :many
+SELECT workout_name, utw_date 
+FROM user_track_workouts
+WHERE username = $1
+ORDER BY utw_date
+LIMIT $2
+OFFSET $3
+`
+
+type GetRecordsParams struct {
+	Username string `json:"username"`
+	Limit    int32  `json:"limit"`
+	Offset   int32  `json:"offset"`
+}
+
+type GetRecordsRow struct {
+	WorkoutName string `json:"workout_name"`
+	UtwDate     string `json:"utw_date"`
+}
+
+func (q *Queries) GetRecords(ctx context.Context, arg GetRecordsParams) ([]GetRecordsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getRecords, arg.Username, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetRecordsRow{}
+	for rows.Next() {
+		var i GetRecordsRow
+		if err := rows.Scan(&i.WorkoutName, &i.UtwDate); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const recordWorkout = `-- name: RecordWorkout :one
 INSERT into user_track_workouts (
     username,

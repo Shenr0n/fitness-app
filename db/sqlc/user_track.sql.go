@@ -20,9 +20,9 @@ func (q *Queries) DeleteUserTrack(ctx context.Context, username string) error {
 }
 
 const getUserTrack = `-- name: GetUserTrack :many
-SELECT ut_id, username, weight, ut_date, created_at FROM user_track 
+SELECT ut_date, weight FROM user_track 
 WHERE username = $1 
-ORDER BY ut_id 
+ORDER BY ut_date
 LIMIT $2 
 OFFSET $3
 `
@@ -33,22 +33,21 @@ type GetUserTrackParams struct {
 	Offset   int32  `json:"offset"`
 }
 
-func (q *Queries) GetUserTrack(ctx context.Context, arg GetUserTrackParams) ([]UserTrack, error) {
+type GetUserTrackRow struct {
+	UtDate string `json:"ut_date"`
+	Weight int32  `json:"weight"`
+}
+
+func (q *Queries) GetUserTrack(ctx context.Context, arg GetUserTrackParams) ([]GetUserTrackRow, error) {
 	rows, err := q.db.QueryContext(ctx, getUserTrack, arg.Username, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []UserTrack{}
+	items := []GetUserTrackRow{}
 	for rows.Next() {
-		var i UserTrack
-		if err := rows.Scan(
-			&i.UtID,
-			&i.Username,
-			&i.Weight,
-			&i.UtDate,
-			&i.CreatedAt,
-		); err != nil {
+		var i GetUserTrackRow
+		if err := rows.Scan(&i.UtDate, &i.Weight); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

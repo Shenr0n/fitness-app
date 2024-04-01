@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/Shenr0n/fitness-app/util"
@@ -52,5 +53,26 @@ func TestGetMacros(t *testing.T) {
 	for _, uM := range userMacros {
 		require.NotEmpty(t, uM)
 		require.Equal(t, userMacro.Username, uM.Username)
+		fmt.Println(uM.Username, " ", uM.UmDate, " ", uM.Calories, " ", uM.Carbs, " ", uM.Fats, " ", uM.Protein)
+	}
+}
+
+func TestGetMacroByDate(t *testing.T) {
+	userMacro := createRandomMacro(t)
+	arg := GetMacroByDateParams{
+		Username: userMacro.Username,
+		UmDate:   userMacro.UmDate,
+		Limit:    5,
+		Offset:   0,
+	}
+	macroByDate, err := testQueries.GetMacroByDate(context.Background(), arg)
+	require.NoError(t, err)
+	require.NotEmpty(t, macroByDate)
+
+	for _, macroDt := range macroByDate {
+		require.NotEmpty(t, macroDt)
+		require.Equal(t, userMacro.Username, macroDt.Username)
+		require.Equal(t, userMacro.UmDate, macroDt.UmDate)
+		fmt.Println(macroDt.Username, " ", macroDt.UmDate, " ", macroDt.Calories, " ", macroDt.Carbs, " ", macroDt.Fats, " ", macroDt.Protein)
 	}
 }

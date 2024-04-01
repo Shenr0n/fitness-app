@@ -18,7 +18,7 @@ ORDER BY um_id
 LIMIT $2 
 OFFSET $3;
 
--- name: GetMacro :one
+-- name: GetMacroByDate :many
 SELECT * FROM user_macros 
 WHERE username = $1
 	AND um_date = $2

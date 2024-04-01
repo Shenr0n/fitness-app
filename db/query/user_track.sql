@@ -9,9 +9,9 @@ INSERT into user_track (
 RETURNING *;
 
 -- name: GetUserTrack :many
-SELECT * FROM user_track 
+SELECT ut_date, weight FROM user_track 
 WHERE username = $1 
-ORDER BY ut_id 
+ORDER BY ut_date
 LIMIT $2 
 OFFSET $3;
 

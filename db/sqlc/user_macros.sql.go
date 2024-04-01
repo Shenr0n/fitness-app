@@ -19,7 +19,7 @@ func (q *Queries) DeleteUserMacros(ctx context.Context, username string) error {
 	return err
 }
 
-const getMacro = `-- name: GetMacro :one
+const getMacroByDate = `-- name: GetMacroByDate :many
 SELECT um_id, username, calories, fats, protein, carbs, um_date, created_at FROM user_macros 
 WHERE username = $1
 	AND um_date = $2
@@ -27,32 +27,48 @@ LIMIT $3
 OFFSET $4
 `
 
-type GetMacroParams struct {
+type GetMacroByDateParams struct {
 	Username string `json:"username"`
 	UmDate   string `json:"um_date"`
 	Limit    int32  `json:"limit"`
 	Offset   int32  `json:"offset"`
 }
 
-func (q *Queries) GetMacro(ctx context.Context, arg GetMacroParams) (UserMacro, error) {
-	row := q.db.QueryRowContext(ctx, getMacro,
+func (q *Queries) GetMacroByDate(ctx context.Context, arg GetMacroByDateParams) ([]UserMacro, error) {
+	rows, err := q.db.QueryContext(ctx, getMacroByDate,
 		arg.Username,
 		arg.UmDate,
 		arg.Limit,
 		arg.Offset,
 	)
-	var i UserMacro
-	err := row.Scan(
-		&i.UmID,
-		&i.Username,
-		&i.Calories,
-		&i.Fats,
-		&i.Protein,
-		&i.Carbs,
-		&i.UmDate,
-		&i.CreatedAt,
-	)
-	return i, err
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []UserMacro{}
+	for rows.Next() {
+		var i UserMacro
+		if err := rows.Scan(
+			&i.UmID,
+			&i.Username,
+			&i.Calories,
+			&i.Fats,
+			&i.Protein,
+			&i.Carbs,
+			&i.UmDate,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getMacros = `-- name: GetMacros :many
