@@ -43,3 +43,13 @@ func TestGetWorkouts(t *testing.T) {
 		fmt.Println("Workout id & name: ", workoutItem.WorkoutID, workoutItem.WorkoutName)
 	}
 }
+
+/*
+func TestDeleteWorkout(t *testing.T) {
+	workout := createRandomWorkout(t)
+	require.NotEmpty(t, workout)
+	fmt.Println("ID: ", workout.WorkoutID, " username: ", workout.Username)
+	err := testQueries.DeleteWorkout(context.Background(), workout.Username)
+	require.NoError(t, err)
+}
+*/

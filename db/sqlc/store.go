@@ -11,86 +11,27 @@ type DeleteUserInfoParams struct {
 	HashedPassword string `json:"hashed_password"`
 }
 
-type SQLStore struct {
+type Store struct {
 	*Queries
 	db *sql.DB
 }
 
-/*type Store interface {
-	Querier
-	DeleteUserInfo(ctx context.Context, arg DeleteUserInfoParams) error
-}*/
-
-func (store *SQLStore) DeleteUserInfo(ctx context.Context, arg DeleteUserInfoParams) error {
-	// Begin a transaction
-	tx, err := store.db.Begin()
-	if err != nil {
-		return err
+func NewStore(db *sql.DB) *Store {
+	return &Store{
+		db:      db,
+		Queries: New(db),
 	}
-	// Defer transaction rollback or commit
-	defer func() {
-		if err != nil {
-			tx.Rollback()
-			return
-		}
-		tx.Commit()
-	}()
-
-	// Execute delete operations within the transaction
-	err = store.execTx(ctx, tx, func(q *Queries) error {
-
-		// Delete user's exercises
-		err := q.DeleteExercise(ctx, arg.Username)
-		if err != nil {
-			return err
-		}
-
-		// Delete user's workouts
-		err = q.DeleteWorkouts(ctx, arg.Username)
-		if err != nil {
-			return err
-		}
-
-		// Delete user's workout exercises
-		err = q.DeleteWorkoutExercises(ctx, arg.Username)
-		if err != nil {
-			return err
-		}
-
-		// Delete user's tracked workouts
-		err = q.DeleteUserTrackWorkouts(ctx, arg.Username)
-		if err != nil {
-			return err
-		}
-
-		// Delete user's track info
-		err = q.DeleteUserTrack(ctx, arg.Username)
-		if err != nil {
-			return err
-		}
-
-		// Delete user's macros
-		err = q.DeleteUserMacros(ctx, arg.Username)
-		if err != nil {
-			return err
-		}
-
-		// Delete the user
-		err = q.DeleteUser(ctx, arg.Username)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
-
-	return err
 }
 
 // Execute function within a db transaction
-func (store *SQLStore) execTx(ctx context.Context, tx *sql.Tx, fn func(*Queries) error) error {
+func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
+	tx, err := store.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
 	q := New(tx)
-	err := fn(q)
+	err = fn(q)
 	if err != nil {
 		if rbErr := tx.Rollback(); rbErr != nil {
 			return fmt.Errorf("tx err: %v, rb err: %v", err, rbErr)
@@ -98,4 +39,90 @@ func (store *SQLStore) execTx(ctx context.Context, tx *sql.Tx, fn func(*Queries)
 		return err
 	}
 	return tx.Commit()
+}
+
+func (store *Store) DeleteExercise(ctx context.Context, arg DeleteExerciseParams) error {
+
+	err := store.execTx(ctx, func(q *Queries) error {
+		var err error
+		err = q.DeleteExerciseInWE(ctx, DeleteExerciseInWEParams{
+			Username: arg.Username,
+			ExerID:   arg.ExerID,
+		})
+		if err != nil {
+			return err
+		}
+		err = q.DeleteExercise(ctx, DeleteExerciseParams{
+			Username: arg.Username,
+			ExerID:   arg.ExerID,
+		})
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return err
+}
+
+func (store *Store) DeleteWorkout(ctx context.Context, arg DeleteWorkoutParams) error {
+
+	err := store.execTx(ctx, func(q *Queries) error {
+		var err error
+		err = q.DeleteWorkoutInWE(ctx, DeleteWorkoutInWEParams{
+			Username:  arg.Username,
+			WorkoutID: arg.WorkoutID,
+		})
+		if err != nil {
+			return err
+		}
+		err = q.DeleteWorkout(ctx, DeleteWorkoutParams{
+			Username:  arg.Username,
+			WorkoutID: arg.WorkoutID,
+		})
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return err
+}
+
+func (store *Store) DeleteUser(ctx context.Context, username string) error {
+
+	err := store.execTx(ctx, func(q *Queries) error {
+		var err error
+		err = q.DeleteUserTrack(ctx, username)
+		if err != nil {
+			return err
+		}
+		err = q.DeleteUserMacros(ctx, username)
+		if err != nil {
+			return err
+		}
+		err = q.DeleteUserTrackWorkouts(ctx, username)
+		if err != nil {
+			return err
+		}
+		err = q.DeleteUserWorkoutExercises(ctx, username)
+		if err != nil {
+			return err
+		}
+		err = q.DeleteUserWorkouts(ctx, username)
+		if err != nil {
+			return err
+		}
+		err = q.DeleteUserExercises(ctx, username)
+		if err != nil {
+			return err
+		}
+		err = q.DeleteUser(ctx, username)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return err
 }

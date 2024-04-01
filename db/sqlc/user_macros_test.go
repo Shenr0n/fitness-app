@@ -76,3 +76,11 @@ func TestGetMacroByDate(t *testing.T) {
 		fmt.Println(macroDt.Username, " ", macroDt.UmDate, " ", macroDt.Calories, " ", macroDt.Carbs, " ", macroDt.Fats, " ", macroDt.Protein)
 	}
 }
+
+func TestDeleteMacros(t *testing.T) {
+	macro := createRandomMacro(t)
+	require.NotEmpty(t, macro)
+	fmt.Println("user: ", macro.Username, " macro id: ", macro.UmID)
+	err := testQueries.DeleteUserMacros(context.Background(), macro.Username)
+	require.NoError(t, err)
+}

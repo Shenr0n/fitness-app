@@ -23,6 +23,16 @@ LIMIT $3
 OFFSET $4;
 
 
--- name: DeleteWorkoutExercises :exec
+-- name: DeleteUserWorkoutExercises :exec
 DELETE FROM workout_exercises
 WHERE username = $1;
+
+-- name: DeleteExerciseInWE :exec
+DELETE FROM workout_exercises
+WHERE username = $1
+  AND exer_id = $2;
+
+-- name: DeleteWorkoutInWE :exec
+DELETE FROM workout_exercises
+WHERE username = $1
+  AND workout_id = $2;

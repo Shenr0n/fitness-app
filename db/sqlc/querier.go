@@ -14,13 +14,17 @@ type Querier interface {
 	CreateExercise(ctx context.Context, arg CreateExerciseParams) (Exercise, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	CreateWorkout(ctx context.Context, arg CreateWorkoutParams) (Workout, error)
-	DeleteExercise(ctx context.Context, username string) error
+	DeleteExercise(ctx context.Context, arg DeleteExerciseParams) error
+	DeleteExerciseInWE(ctx context.Context, arg DeleteExerciseInWEParams) error
 	DeleteUser(ctx context.Context, username string) error
+	DeleteUserExercises(ctx context.Context, username string) error
 	DeleteUserMacros(ctx context.Context, username string) error
 	DeleteUserTrack(ctx context.Context, username string) error
 	DeleteUserTrackWorkouts(ctx context.Context, username string) error
-	DeleteWorkoutExercises(ctx context.Context, username string) error
-	DeleteWorkouts(ctx context.Context, username string) error
+	DeleteUserWorkoutExercises(ctx context.Context, username string) error
+	DeleteUserWorkouts(ctx context.Context, username string) error
+	DeleteWorkout(ctx context.Context, arg DeleteWorkoutParams) error
+	DeleteWorkoutInWE(ctx context.Context, arg DeleteWorkoutInWEParams) error
 	GetExercises(ctx context.Context, arg GetExercisesParams) ([]Exercise, error)
 	GetMacroByDate(ctx context.Context, arg GetMacroByDateParams) ([]UserMacro, error)
 	GetMacros(ctx context.Context, arg GetMacrosParams) ([]UserMacro, error)

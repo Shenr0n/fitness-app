@@ -56,13 +56,45 @@ func (q *Queries) AddExerciseToWorkout(ctx context.Context, arg AddExerciseToWor
 	return i, err
 }
 
-const deleteWorkoutExercises = `-- name: DeleteWorkoutExercises :exec
+const deleteExerciseInWE = `-- name: DeleteExerciseInWE :exec
+DELETE FROM workout_exercises
+WHERE username = $1
+  AND exer_id = $2
+`
+
+type DeleteExerciseInWEParams struct {
+	Username string `json:"username"`
+	ExerID   int64  `json:"exer_id"`
+}
+
+func (q *Queries) DeleteExerciseInWE(ctx context.Context, arg DeleteExerciseInWEParams) error {
+	_, err := q.db.ExecContext(ctx, deleteExerciseInWE, arg.Username, arg.ExerID)
+	return err
+}
+
+const deleteUserWorkoutExercises = `-- name: DeleteUserWorkoutExercises :exec
 DELETE FROM workout_exercises
 WHERE username = $1
 `
 
-func (q *Queries) DeleteWorkoutExercises(ctx context.Context, username string) error {
-	_, err := q.db.ExecContext(ctx, deleteWorkoutExercises, username)
+func (q *Queries) DeleteUserWorkoutExercises(ctx context.Context, username string) error {
+	_, err := q.db.ExecContext(ctx, deleteUserWorkoutExercises, username)
+	return err
+}
+
+const deleteWorkoutInWE = `-- name: DeleteWorkoutInWE :exec
+DELETE FROM workout_exercises
+WHERE username = $1
+  AND workout_id = $2
+`
+
+type DeleteWorkoutInWEParams struct {
+	Username  string `json:"username"`
+	WorkoutID int64  `json:"workout_id"`
+}
+
+func (q *Queries) DeleteWorkoutInWE(ctx context.Context, arg DeleteWorkoutInWEParams) error {
+	_, err := q.db.ExecContext(ctx, deleteWorkoutInWE, arg.Username, arg.WorkoutID)
 	return err
 }
 

@@ -36,13 +36,29 @@ func (q *Queries) CreateWorkout(ctx context.Context, arg CreateWorkoutParams) (W
 	return i, err
 }
 
-const deleteWorkouts = `-- name: DeleteWorkouts :exec
+const deleteUserWorkouts = `-- name: DeleteUserWorkouts :exec
 DELETE FROM workouts
 WHERE username = $1
 `
 
-func (q *Queries) DeleteWorkouts(ctx context.Context, username string) error {
-	_, err := q.db.ExecContext(ctx, deleteWorkouts, username)
+func (q *Queries) DeleteUserWorkouts(ctx context.Context, username string) error {
+	_, err := q.db.ExecContext(ctx, deleteUserWorkouts, username)
+	return err
+}
+
+const deleteWorkout = `-- name: DeleteWorkout :exec
+DELETE FROM workouts
+WHERE username = $1
+  AND workout_id = $2
+`
+
+type DeleteWorkoutParams struct {
+	Username  string `json:"username"`
+	WorkoutID int64  `json:"workout_id"`
+}
+
+func (q *Queries) DeleteWorkout(ctx context.Context, arg DeleteWorkoutParams) error {
+	_, err := q.db.ExecContext(ctx, deleteWorkout, arg.Username, arg.WorkoutID)
 	return err
 }
 

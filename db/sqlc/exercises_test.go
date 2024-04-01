@@ -46,3 +46,12 @@ func TestGetExercises(t *testing.T) {
 		fmt.Println("Exercise name: ", exerItem.ExerciseName)
 	}
 }
+
+/*
+func TestDeleteExercise(t *testing.T) {
+	exer := createRandomExercise(t)
+	require.NotEmpty(t, exer)
+	fmt.Println("ID: ", exer.ExerID, " username: ", exer.Username)
+	err := testQueries.DeleteExercise(context.Background(), exer.Username)
+	require.NoError(t, err)
+}*/

@@ -50,3 +50,11 @@ func TestGetRecords(t *testing.T) {
 	}
 
 }
+
+func TestDeleteUserTrackWorkouts(t *testing.T) {
+	utw := randomUserTrackWorkout(t)
+	require.NotEmpty(t, utw)
+	fmt.Println("user: ", utw.Username, " utw id: ", utw.UtwID)
+	err := testQueries.DeleteUserTrackWorkouts(context.Background(), utw.Username)
+	require.NoError(t, err)
+}

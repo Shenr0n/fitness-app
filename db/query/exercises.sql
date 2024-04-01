@@ -17,4 +17,9 @@ OFFSET $3;
 
 -- name: DeleteExercise :exec
 DELETE FROM exercises
+WHERE username = $1
+	AND exer_id = $2;
+
+-- name: DeleteUserExercises :exec
+DELETE FROM exercises
 WHERE username = $1;

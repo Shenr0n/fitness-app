@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/Shenr0n/fitness-app/util"
@@ -42,4 +43,12 @@ func TestGetUserTrack(t *testing.T) {
 	for _, uT := range uTList {
 		require.NotEmpty(t, uT)
 	}
+}
+
+func TestDeleteUserTrack(t *testing.T) {
+	ut := randomUserTrack(t)
+	require.NotEmpty(t, ut)
+	fmt.Println("user: ", ut.Username, " ut id: ", ut.UtID)
+	err := testQueries.DeleteUserTrackWorkouts(context.Background(), ut.Username)
+	require.NoError(t, err)
 }

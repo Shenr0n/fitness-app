@@ -14,6 +14,11 @@ ORDER BY workout_id
 LIMIT $2 
 OFFSET $3;
 
--- name: DeleteWorkouts :exec
+-- name: DeleteWorkout :exec
+DELETE FROM workouts
+WHERE username = $1
+  AND workout_id = $2;
+
+-- name: DeleteUserWorkouts :exec
 DELETE FROM workouts
 WHERE username = $1;
