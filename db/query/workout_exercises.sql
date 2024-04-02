@@ -32,6 +32,12 @@ DELETE FROM workout_exercises
 WHERE username = $1
   AND exer_id = $2;
 
+-- name: DeleteExerciseInWorkoutWE :exec
+DELETE FROM workout_exercises
+WHERE username = $1
+  AND workout_id = $2
+  AND exer_id = $3;
+
 -- name: DeleteWorkoutInWE :exec
 DELETE FROM workout_exercises
 WHERE username = $1

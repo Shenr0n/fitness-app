@@ -8,6 +8,10 @@ INSERT INTO exercises (
 )
 RETURNING *;
 
+-- name: GetExercise :one
+SELECT * FROM exercises
+WHERE exer_id = $1;
+
 -- name: GetExercises :many
 SELECT * FROM exercises
 WHERE username = $1 

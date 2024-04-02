@@ -65,6 +65,24 @@ func (q *Queries) DeleteUserExercises(ctx context.Context, username string) erro
 	return err
 }
 
+const getExercise = `-- name: GetExercise :one
+SELECT exer_id, username, exercise_name, muscle_group, created_at FROM exercises
+WHERE exer_id = $1
+`
+
+func (q *Queries) GetExercise(ctx context.Context, exerID int64) (Exercise, error) {
+	row := q.db.QueryRowContext(ctx, getExercise, exerID)
+	var i Exercise
+	err := row.Scan(
+		&i.ExerID,
+		&i.Username,
+		&i.ExerciseName,
+		&i.MuscleGroup,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getExercises = `-- name: GetExercises :many
 SELECT exer_id, username, exercise_name, muscle_group, created_at FROM exercises
 WHERE username = $1 

@@ -15,13 +15,13 @@ type getUserAndDateRequest struct {
 }
 
 type createUserRequest struct {
-	Username       string `json:"username" binding:"required,alphanum"`
-	HashedPassword string `json:"password" binding:"required,min=6"`
-	FullName       string `json:"full_name" binding:"required"`
-	Email          string `json:"email" binding:"required,email"`
-	Dob            string `json:"dob" binding:"required" time_format:"2006-01-02"`
-	Weight         int32  `json:"weight" binding:"required"`
-	Height         int32  `json:"height" binding:"required"`
+	Username string `json:"username" binding:"required,alphanum"`
+	Password string `json:"password" binding:"required,min=6"`
+	FullName string `json:"full_name" binding:"required"`
+	Email    string `json:"email" binding:"required,email"`
+	Dob      string `json:"dob" binding:"required" time_format:"2006-01-02"`
+	Weight   int32  `json:"weight" binding:"required,gt=0"`
+	Height   int32  `json:"height" binding:"required,gt=0"`
 }
 
 type userResponse struct {
@@ -33,16 +33,26 @@ type userResponse struct {
 	Height   int32  `json:"height"`
 }
 
+type loginUserRequest struct {
+	Username string `json:"username" binding:"required,alphanum"`
+	Password string `json:"password" binding:"required,min=6"`
+}
+
+type loginUserResponse struct {
+	AccessToken string       `json:"access_token"`
+	User        userResponse `json:"user"`
+}
+
 type recordMacrosRequest struct {
-	Calories int32  `json:"calories" binding:"required"`
-	Fats     int32  `json:"fats" binding:"required"`
-	Protein  int32  `json:"protein" binding:"required"`
-	Carbs    int32  `json:"carbs" binding:"required"`
+	Calories int32  `json:"calories" binding:"required,gt=0"`
+	Fats     int32  `json:"fats" binding:"required,gt=0"`
+	Protein  int32  `json:"protein" binding:"required,gt=0"`
+	Carbs    int32  `json:"carbs" binding:"required,gt=0"`
 	UmDate   string `json:"um_date" binding:"required" time_format:"2006-01-02"`
 }
 
 type recordUserTrackRequest struct {
-	Weight int32  `json:"weight" binding:"required"`
+	Weight int32  `json:"weight" binding:"required,gt=0"`
 	UtDate string `json:"ut_date" binding:"required"`
 }
 
@@ -66,4 +76,16 @@ type deleteWorkoutRequest struct {
 
 type createWorkoutRequest struct {
 	WorkoutName string `json:"workout_name" binding:"required"`
+}
+
+type addExerciseToWorkoutRequest struct {
+	WorkoutID int64 `json:"workout_id" binding:"required"`
+	ExerID    int64 `json:"exer_id" binding:"required"`
+	Weights   int32 `json:"weights" binding:"required"`
+	Sets      int32 `json:"sets" binding:"required"`
+	Reps      int32 `json:"reps" binding:"required"`
+}
+type deleteExerciseInWorkoutRequest struct {
+	WorkoutID int64 `json:"workout_id" binding:"required"`
+	ExerID    int64 `json:"exer_id" binding:"required"`
 }

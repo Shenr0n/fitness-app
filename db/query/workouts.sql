@@ -7,6 +7,10 @@ INSERT INTO workouts (
 )
 RETURNING *;
 
+-- name: GetWorkout :one
+SELECT * FROM workouts
+WHERE workout_id = $1;
+
 -- name: GetWorkouts :many
 SELECT * FROM workouts
 WHERE username = $1 

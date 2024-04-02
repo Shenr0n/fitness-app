@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	db "github.com/Shenr0n/fitness-app/db/sqlc"
+	"github.com/Shenr0n/fitness-app/token"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,8 +20,14 @@ func (server *Server) recordMacros(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if req.Username != authPayload.Username {
+		ctx.JSON(http.StatusUnauthorized, nil)
+		return
+	}
+
 	arg := db.RecordMacrosParams{
-		Username: req.Username,
+		Username: authPayload.Username,
 		Calories: reqMacro.Calories,
 		Fats:     reqMacro.Fats,
 		Protein:  reqMacro.Protein,
@@ -49,8 +56,15 @@ func (server *Server) getMacros(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if req.Username != authPayload.Username {
+		ctx.JSON(http.StatusUnauthorized, nil)
+		return
+	}
+
 	arg := db.GetMacrosParams{
-		Username: req.Username,
+		//Username: req.Username,
+		Username: authPayload.Username,
 		Limit:    reqPage.PageSize,
 		Offset:   (reqPage.PageID - 1) * reqPage.PageSize,
 	}
@@ -59,6 +73,13 @@ func (server *Server) getMacros(ctx *gin.Context) {
 		ctx.JSON(http.StatusNotFound, errorResponse(err))
 		return
 	}
+
+	/*authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if req.Username != authPayload.Username {
+		err := errors.New("You're unautorized to view other users")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}*/
 
 	ctx.JSON(http.StatusOK, macros)
 }
@@ -75,9 +96,14 @@ func (server *Server) getMacroByDate(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if req.Username != authPayload.Username {
+		ctx.JSON(http.StatusUnauthorized, nil)
+		return
+	}
 
 	arg := db.GetMacroByDateParams{
-		Username: req.Username,
+		Username: authPayload.Username,
 		UmDate:   req.UmDate,
 		Limit:    reqPage.PageSize,
 		Offset:   (reqPage.PageID - 1) * reqPage.PageSize,

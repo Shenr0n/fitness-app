@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	db "github.com/Shenr0n/fitness-app/db/sqlc"
+	"github.com/Shenr0n/fitness-app/token"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,8 +20,13 @@ func (server *Server) createExercise(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if req.Username != authPayload.Username {
+		ctx.JSON(http.StatusUnauthorized, nil)
+		return
+	}
 	arg := db.CreateExerciseParams{
-		Username:     req.Username,
+		Username:     authPayload.Username,
 		ExerciseName: reqExer.ExerciseName,
 		MuscleGroup:  reqExer.MuscleGroup,
 	}
@@ -44,8 +50,14 @@ func (server *Server) getExercises(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 	}
 
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if req.Username != authPayload.Username {
+		ctx.JSON(http.StatusUnauthorized, nil)
+		return
+	}
+
 	arg := db.GetExercisesParams{
-		Username: req.Username,
+		Username: authPayload.Username,
 		Limit:    reqPage.PageSize,
 		Offset:   (reqPage.PageID - 1) * reqPage.PageSize,
 	}
@@ -68,8 +80,13 @@ func (server *Server) deleteExercise(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if req.Username != authPayload.Username {
+		ctx.JSON(http.StatusUnauthorized, nil)
+		return
+	}
 	arg := db.DeleteExerciseParams{
-		Username: req.Username,
+		Username: authPayload.Username,
 		ExerID:   reqExerID.ExerID,
 	}
 	err := server.store.DeleteExercise(ctx, arg)
