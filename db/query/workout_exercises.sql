@@ -22,7 +22,6 @@ ORDER BY we.exer_id
 LIMIT $3 
 OFFSET $4;
 
-
 -- name: DeleteUserWorkoutExercises :exec
 DELETE FROM workout_exercises
 WHERE username = $1;

@@ -9,6 +9,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func newExerInWorkoutResponse(eiw db.GetWorkoutExercisesRow) exerciseInWorkoutResponse {
+	return exerciseInWorkoutResponse{
+		WorkoutID:    eiw.WorkoutID,
+		WorkoutName:  eiw.WorkoutName,
+		ExerID:       eiw.ExerID,
+		ExerciseName: eiw.ExerciseName,
+		MuscleGroup:  eiw.MuscleGroup,
+		Weights:      eiw.Weights,
+		Sets:         eiw.Sets,
+		Reps:         eiw.Reps,
+	}
+}
+
 func (server *Server) addExerciseToWorkout(ctx *gin.Context) {
 	var req getUserRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -59,7 +72,7 @@ func (server *Server) addExerciseToWorkout(ctx *gin.Context) {
 
 }
 
-func (server *Server) deleteExerciseInWE(ctx *gin.Context) {
+func (server *Server) deleteExerciseInWorkout(ctx *gin.Context) {
 	var req getUserRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -101,4 +114,61 @@ func (server *Server) deleteExerciseInWE(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, nil)
+}
+
+func (server *Server) getWorkoutExercises(ctx *gin.Context) {
+	// Get username from uri
+	var req getUserRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	// Check token and uri values
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if req.Username != authPayload.Username {
+		ctx.JSON(http.StatusUnauthorized, nil)
+		return
+	}
+
+	// Get page id and size
+	var reqPage getPageRequest
+	if err := ctx.ShouldBindQuery(&reqPage); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	var workout getWorkoutRequest
+	if err := ctx.ShouldBindJSON(&workout); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	workoutCheck, errWork := server.store.GetWorkout(ctx, workout.WorkoutID)
+	if errWork != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(errWork))
+		return
+	}
+	if authPayload.Username != workoutCheck.Username {
+		ctx.JSON(http.StatusBadRequest, errorResponse(errors.New("Workout not found")))
+		return
+	}
+
+	arg := db.GetWorkoutExercisesParams{
+		Username:  authPayload.Username,
+		WorkoutID: workout.WorkoutID,
+		Limit:     reqPage.PageSize,
+		Offset:    (reqPage.PageID - 1) * reqPage.PageSize,
+	}
+
+	exercises, err := server.store.GetWorkoutExercises(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, errorResponse(err))
+		return
+	}
+	var rsp []exerciseInWorkoutResponse
+	for _, exer := range exercises {
+		rsp = append(rsp, newExerInWorkoutResponse(exer))
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
 }

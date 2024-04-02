@@ -47,18 +47,19 @@ func (server *Server) setupRouter() {
 	// User
 	authRoutes.GET("/users/:username", server.getUser)
 	authRoutes.DELETE("/users/:username/delete", server.deleteUser)
-	router.PATCH("/users/:username/password", nil)
-	router.PATCH("/users/:username/weight", nil)
-	router.PATCH("/users/:username/height", nil)
+	authRoutes.PATCH("/users/:username/password", server.updateUserPassword)
+	authRoutes.PATCH("/users/:username", nil)
 
 	// User Macros
 	authRoutes.POST("/users/:username/macros", server.recordMacros)
 	authRoutes.GET("/users/:username/macros", server.getMacros)
 	authRoutes.GET("/users/:username/macros/:um_date", server.getMacroByDate)
+	authRoutes.DELETE("/users/:username/macros", nil)
 
 	// User Track
 	authRoutes.POST("/users/:username/track", server.recordUserTrack)
 	authRoutes.GET("/users/:username/track", server.getUserTrack)
+	authRoutes.DELETE("/users/:username/track", nil)
 
 	// Exercises
 	authRoutes.POST("/users/:username/exercises", server.createExercise)
@@ -72,11 +73,14 @@ func (server *Server) setupRouter() {
 
 	// Workout Exercises
 	authRoutes.POST("/users/:username/workout/exercises", server.addExerciseToWorkout)
-	authRoutes.GET("/users/:username/workout/exercises", nil)
+	authRoutes.GET("/users/:username/workout/exercises", server.getWorkoutExercises)
+	authRoutes.DELETE("/users/:username/workout/exercises", server.deleteExerciseInWorkout)
+	authRoutes.PATCH("/users/:username/workout/exercises", nil)
 
 	// User Workouts Record
-	router.POST("/users/:username/records", nil)
-	router.GET("/users/:username/records", nil)
+	authRoutes.POST("/users/:username/records", server.recordUserWorkout)
+	authRoutes.GET("/users/:username/records", server.getUserWorkoutRecords)
+	authRoutes.DELETE("/users/:username/records", server.deleteUserWorkoutRecord)
 
 	server.router = router
 

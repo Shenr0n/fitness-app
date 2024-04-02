@@ -75,7 +75,7 @@ func (server *Server) deleteExercise(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	var reqExerID deleteExerciseRequest
+	var reqExerID getExerciseRequest
 	if err := ctx.ShouldBindJSON(&reqExerID); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return

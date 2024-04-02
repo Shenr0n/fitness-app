@@ -17,8 +17,6 @@ INSERT INTO exercises (username, exercise_name, muscle_group, created_at)
 SELECT $1, exercise_name, muscle_group, NOW()
 FROM default_exercises;
 
-
-
 -- name: GetUser :one
 SELECT * FROM users
 WHERE username = $1 LIMIT 1;

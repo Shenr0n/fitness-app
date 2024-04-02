@@ -1,5 +1,8 @@
 package api
 
+type SuccessResponse struct {
+	Msg string `json:"message"`
+}
 type getUserRequest struct {
 	Username string `uri:"username" binding:"required,min=1"`
 }
@@ -66,12 +69,16 @@ type createExerciseRequest struct {
 	MuscleGroup  string `json:"muscle_group" binding:"required"`
 }
 
-type deleteExerciseRequest struct {
+type getExerciseRequest struct {
 	ExerID int64 `json:"exer_id" binding:"required"`
 }
 
-type deleteWorkoutRequest struct {
+type getWorkoutRequest struct {
 	WorkoutID int64 `json:"workout_id" binding:"required"`
+}
+
+type getUtwIDRequest struct {
+	UtwID int64 `json:"utw_id" binding:"required"`
 }
 
 type createWorkoutRequest struct {
@@ -88,4 +95,31 @@ type addExerciseToWorkoutRequest struct {
 type deleteExerciseInWorkoutRequest struct {
 	WorkoutID int64 `json:"workout_id" binding:"required"`
 	ExerID    int64 `json:"exer_id" binding:"required"`
+}
+
+type exerciseInWorkoutResponse struct {
+	WorkoutID    int64  `json:"workout_id"`
+	WorkoutName  string `json:"workout_name"`
+	ExerID       int64  `json:"exer_id"`
+	ExerciseName string `json:"exercise_name"`
+	MuscleGroup  string `json:"muscle_group"`
+	Weights      int32  `json:"weights"`
+	Sets         int32  `json:"sets"`
+	Reps         int32  `json:"reps"`
+}
+
+type recordUserWorkoutRequest struct {
+	WorkoutID int64  `json:"workout_id" binding:"required"`
+	UtwDate   string `json:"utw_date" binding:"required"`
+}
+
+type recordResponse struct {
+	UtwID       int64  `json:"utw_id"`
+	WorkoutID   int64  `json:"workout_id"`
+	WorkoutName string `json:"workout_name"`
+	UtwDate     string `json:"utw_date"`
+}
+
+type passwordChangeRequest struct {
+	Password string `json:"password" binding:"required,min=6"`
 }

@@ -10,6 +10,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func successResponse(msg string) SuccessResponse {
+	return SuccessResponse{Msg: msg}
+}
+
 func newUserResponse(user db.User) userResponse {
 	return userResponse{
 		Username: user.Username,
@@ -129,4 +133,39 @@ func (server *Server) loginUser(ctx *gin.Context) {
 		User:        newUserResponse(user),
 	}
 	ctx.JSON(http.StatusOK, rsp)
+}
+
+func (server *Server) updateUserPassword(ctx *gin.Context) {
+	var req getUserRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if req.Username != authPayload.Username {
+		ctx.JSON(http.StatusUnauthorized, nil)
+		return
+	}
+	var newPass passwordChangeRequest
+	if err := ctx.ShouldBindJSON(&newPass); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	hashedPassword, err := util.HashPassword(newPass.Password)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdatePasswordParams{
+		Username:       authPayload.Username,
+		HashedPassword: hashedPassword,
+	}
+
+	err = server.store.UpdatePassword(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, successResponse("Password Changed Successfully"))
 }

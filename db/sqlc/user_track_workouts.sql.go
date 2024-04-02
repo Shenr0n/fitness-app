@@ -19,8 +19,31 @@ func (q *Queries) DeleteUserTrackWorkouts(ctx context.Context, username string) 
 	return err
 }
 
+const deleteUserWorkoutRecord = `-- name: DeleteUserWorkoutRecord :exec
+DELETE FROM user_track_workouts
+WHERE utw_id = $1
+`
+
+func (q *Queries) DeleteUserWorkoutRecord(ctx context.Context, utwID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteUserWorkoutRecord, utwID)
+	return err
+}
+
+const getRecord = `-- name: GetRecord :one
+SELECT username
+FROM user_track_workouts
+WHERE utw_id = $1
+`
+
+func (q *Queries) GetRecord(ctx context.Context, utwID int64) (string, error) {
+	row := q.db.QueryRowContext(ctx, getRecord, utwID)
+	var username string
+	err := row.Scan(&username)
+	return username, err
+}
+
 const getRecords = `-- name: GetRecords :many
-SELECT workout_name, utw_date 
+SELECT utw_id, workout_id, workout_name, utw_date 
 FROM user_track_workouts
 WHERE username = $1
 ORDER BY utw_date
@@ -35,6 +58,8 @@ type GetRecordsParams struct {
 }
 
 type GetRecordsRow struct {
+	UtwID       int64  `json:"utw_id"`
+	WorkoutID   int64  `json:"workout_id"`
 	WorkoutName string `json:"workout_name"`
 	UtwDate     string `json:"utw_date"`
 }
@@ -48,7 +73,12 @@ func (q *Queries) GetRecords(ctx context.Context, arg GetRecordsParams) ([]GetRe
 	items := []GetRecordsRow{}
 	for rows.Next() {
 		var i GetRecordsRow
-		if err := rows.Scan(&i.WorkoutName, &i.UtwDate); err != nil {
+		if err := rows.Scan(
+			&i.UtwID,
+			&i.WorkoutID,
+			&i.WorkoutName,
+			&i.UtwDate,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
