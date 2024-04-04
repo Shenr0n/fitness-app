@@ -41,6 +41,22 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type UserDetail struct {
+	UdID               int64     `json:"ud_id"`
+	Username           string    `json:"username"`
+	Age                int32     `json:"age"`
+	Weight             int32     `json:"weight"`
+	Height             int32     `json:"height"`
+	GoalWeight         int32     `json:"goal_weight"`
+	DietPref           string    `json:"diet_pref"`
+	FoodAllergies      string    `json:"food_allergies"`
+	DailyCalIntakeGoal int32     `json:"daily_cal_intake_goal"`
+	ActivityLevel      string    `json:"activity_level"`
+	CurrentFitness     string    `json:"current_fitness"`
+	FitnessGoal        string    `json:"fitness_goal"`
+	CreatedAt          time.Time `json:"created_at"`
+}
+
 type UserMacro struct {
 	UmID     int64  `json:"um_id"`
 	Username string `json:"username"`

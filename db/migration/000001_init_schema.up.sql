@@ -20,6 +20,22 @@ CREATE TABLE "users" (
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
+CREATE TABLE "user_details" (
+  "ud_id" bigserial PRIMARY KEY,
+  "username" varchar NOT NULL,
+  "age" integer NOT NULL,
+  "weight" integer NOT NULL,
+  "height" integer NOT NULL,
+  "goal_weight" integer NOT NULL,
+  "diet_pref" varchar NOT NULL,
+  "food_allergies" varchar NOT NULL,
+  "daily_cal_intake_goal" integer NOT NULL,
+  "activity_level" varchar NOT NULL,
+  "current_fitness" varchar NOT NULL,
+  "fitness_goal" varchar NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
 CREATE TABLE "user_track" (
   "ut_id" bigserial PRIMARY KEY,
   "username" varchar NOT NULL,
@@ -110,6 +126,8 @@ COMMENT ON COLUMN "workout_exercises"."sets" IS 'must be positive';
 
 COMMENT ON COLUMN "workout_exercises"."reps" IS 'must be positive';
 
+ALTER TABLE "user_details" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
+
 ALTER TABLE "user_track" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
 ALTER TABLE "user_macros" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
@@ -129,6 +147,7 @@ ALTER TABLE "workout_exercises" ADD FOREIGN KEY ("username") REFERENCES "users" 
 ALTER TABLE "workout_exercises" ADD FOREIGN KEY ("workout_id") REFERENCES "workouts" ("workout_id");
 
 ALTER TABLE "workout_exercises" ADD FOREIGN KEY ("exer_id") REFERENCES "exercises" ("exer_id");
+
 
 INSERT INTO default_exercises (exercise_name, muscle_group) VALUES
 ('Push-ups', 'Chest, Shoulders, Triceps'),

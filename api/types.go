@@ -123,3 +123,43 @@ type recordResponse struct {
 type passwordChangeRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
+
+type recordDetailsRequest struct {
+	GoalWeight         int32  `json:"goal_weight" binding:"required,gt=0"`
+	DietPref           string `json:"diet_pref" binding:"required"`
+	FoodAllergies      string `json:"food_allergies" binding:"required"`
+	DailyCalIntakeGoal int32  `json:"daily_cal_intake_goal" binding:"required,gt=0"`
+	ActivityLevel      string `json:"activity_level" binding:"required"`
+	CurrentFitness     string `json:"current_fitness" binding:"required"`
+	FitnessGoal        string `json:"fitness_goal" binding:"required"`
+}
+type getDietResponse struct {
+	Age                int32  `json:"age"`
+	Weight             int32  `json:"weight"`
+	Height             int32  `json:"height"`
+	GoalWeight         int32  `json:"goal_weight"`
+	DietPref           string `json:"diet_pref"`
+	FoodAllergies      string `json:"food_allergies"`
+	DailyCalIntakeGoal int32  `json:"daily_cal_intake_goal"`
+}
+type getFitnessResponse struct {
+	Age            int32  `json:"age"`
+	Weight         int32  `json:"weight"`
+	Height         int32  `json:"height"`
+	GoalWeight     int32  `json:"goal_weight"`
+	ActivityLevel  string `json:"activity_level"`
+	CurrentFitness string `json:"current_fitness"`
+	FitnessGoal    string `json:"fitness_goal"`
+}
+
+type getGPTQuestionRequest struct {
+	QuestionType string `json:"question_type" binding:"required,oneof=diet fitness"`
+	ReqText      string `json:"question"`
+}
+type getGPTRequest struct {
+	ReqText string `json:"question"`
+}
+
+type getGPTResponse struct {
+	RespText string `json:"chatbot"`
+}

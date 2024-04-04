@@ -21,6 +21,7 @@ func NewServer(config util.Config, store *db.Store) (*Server, error) {
 	if err != nil {
 		return nil, fmt.Errorf("NewPasetoMaker failed: %w", err)
 	}
+
 	server := &Server{
 		config:     config,
 		store:      store,
@@ -82,6 +83,11 @@ func (server *Server) setupRouter() {
 	authRoutes.GET("/users/:username/records", server.getUserWorkoutRecords)
 	authRoutes.DELETE("/users/:username/records", server.deleteUserWorkoutRecord)
 
+	// User details
+	authRoutes.POST("/users/:username/details", server.recordDetails)
+
+	// GPT Chat
+	authRoutes.POST("/users/:username/chatbot", server.gptChat)
 	server.router = router
 
 }

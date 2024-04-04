@@ -14,11 +14,14 @@ ALTER TABLE "user_macros" DROP CONSTRAINT IF EXISTS "user_macros_username_fkey";
 
 ALTER TABLE "user_track" DROP CONSTRAINT IF EXISTS "user_track_username_fkey";
 
+ALTER TABLE "user_details" DROP CONSTRAINT IF EXISTS "user_details_username_fkey";
+
 
 DROP TABLE IF EXISTS "workout_exercises";
 DROP TABLE IF EXISTS "user_track_workouts";
 DROP TABLE IF EXISTS "workouts";
 DROP TABLE IF EXISTS "exercises";
+DROP TABLE IF EXISTS "user_details";
 DROP TABLE IF EXISTS "user_macros";
 DROP TABLE IF EXISTS "user_track";
 DROP TABLE IF EXISTS "users";
