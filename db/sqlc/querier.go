@@ -6,12 +6,15 @@ package db
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type Querier interface {
 	AddDefaultExercises(ctx context.Context, username string) error
 	AddExerciseToWorkout(ctx context.Context, arg AddExerciseToWorkoutParams) (WorkoutExercise, error)
 	CreateExercise(ctx context.Context, arg CreateExerciseParams) (Exercise, error)
+	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	CreateWorkout(ctx context.Context, arg CreateWorkoutParams) (Workout, error)
 	DeleteExercise(ctx context.Context, arg DeleteExerciseParams) error
@@ -35,6 +38,7 @@ type Querier interface {
 	GetMacros(ctx context.Context, arg GetMacrosParams) ([]UserMacro, error)
 	GetRecord(ctx context.Context, utwID int64) (string, error)
 	GetRecords(ctx context.Context, arg GetRecordsParams) ([]GetRecordsRow, error)
+	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetUser(ctx context.Context, username string) (User, error)
 	GetUserTrack(ctx context.Context, arg GetUserTrackParams) ([]GetUserTrackRow, error)
 	GetWorkout(ctx context.Context, workoutID int64) (Workout, error)

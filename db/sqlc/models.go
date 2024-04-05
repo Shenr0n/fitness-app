@@ -7,6 +7,8 @@ package db
 import (
 	"database/sql"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type DefaultExercise struct {
@@ -25,6 +27,17 @@ type Exercise struct {
 	Username     string    `json:"username"`
 	ExerciseName string    `json:"exercise_name"`
 	MuscleGroup  string    `json:"muscle_group"`
+	CreatedAt    time.Time `json:"created_at"`
+}
+
+type Session struct {
+	ID           uuid.UUID `json:"id"`
+	Username     string    `json:"username"`
+	RefreshToken string    `json:"refresh_token"`
+	UserAgent    string    `json:"user_agent"`
+	ClientIp     string    `json:"client_ip"`
+	IsBlocked    bool      `json:"is_blocked"`
+	ExpiresAt    time.Time `json:"expires_at"`
 	CreatedAt    time.Time `json:"created_at"`
 }
 

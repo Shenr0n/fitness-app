@@ -1,5 +1,11 @@
 package api
 
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
 type SuccessResponse struct {
 	Msg string `json:"message"`
 }
@@ -42,10 +48,21 @@ type loginUserRequest struct {
 }
 
 type loginUserResponse struct {
-	AccessToken string       `json:"access_token"`
-	User        userResponse `json:"user"`
+	SessionID             uuid.UUID    `json:"session_id"`
+	AccessToken           string       `json:"access_token"`
+	AccessTokenExpiresAt  time.Time    `json:"access_token_expires_at"`
+	RefreshToken          string       `json:"refresh_token"`
+	RefreshTokenExpiresAt time.Time    `json:"refresh_token_expires_at"`
+	User                  userResponse `json:"user"`
+}
+type renewAccessTokenRequest struct {
+	RefreshToken string `json:"refresh_token" binding:"required"`
 }
 
+type renewAccessTokenResponse struct {
+	AccessToken          string    `json:"access_token"`
+	AccessTokenExpiresAt time.Time `json:"access_token_expires_at"`
+}
 type recordMacrosRequest struct {
 	Calories int32  `json:"calories" binding:"required,gt=0"`
 	Fats     int32  `json:"fats" binding:"required,gt=0"`
